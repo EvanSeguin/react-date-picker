@@ -1,27 +1,27 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import { polyfill } from 'react-lifecycles-compat';
-import makeEventProps from 'make-event-props';
-import mergeClassNames from 'merge-class-names';
-import Fit from 'react-fit';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import { polyfill } from "react-lifecycles-compat";
+import makeEventProps from "make-event-props";
+import mergeClassNames from "merge-class-names";
+import Fit from "react-fit";
 
-import Calendar from 'react-calendar/dist/entry.nostyle';
+import Calendar from "react-calendar/dist/entry.nostyle";
 
-import DateInput from './DateInput';
+import DateInput from "./DateInput";
 
-import { isMaxDate, isMinDate } from './shared/propTypes';
-import { callIfDefined } from './shared/utils';
+import { isMaxDate, isMinDate } from "./shared/propTypes";
+import { callIfDefined } from "./shared/utils";
 
-const baseClassName = 'react-date-picker';
-const outsideActionEvents = ['mousedown', 'focusin', 'touchstart'];
-const allViews = ['century', 'decade', 'year', 'month'];
+const baseClassName = "react-date-picker";
+const outsideActionEvents = ["mousedown", "focusin", "touchstart"];
+const allViews = ["century", "decade", "year", "month"];
 
 export default class DatePicker extends PureComponent {
   static getDerivedStateFromProps(nextProps, prevState) {
     if (nextProps.isOpen !== prevState.isOpenProps) {
       return {
         isOpen: nextProps.isOpen,
-        isOpenProps: nextProps.isOpen,
+        isOpenProps: nextProps.isOpen
       };
     }
 
@@ -52,25 +52,25 @@ export default class DatePicker extends PureComponent {
     return makeEventProps(this.props);
   }
 
-  onOutsideAction = (event) => {
+  onOutsideAction = event => {
     if (this.wrapper && !this.wrapper.contains(event.target)) {
       this.closeCalendar();
     }
-  }
+  };
 
   onChange = (value, closeCalendar = true) => {
     this.setState({
-      isOpen: !closeCalendar,
+      isOpen: !closeCalendar
     });
 
     const { onChange } = this.props;
     if (onChange) {
       onChange(value);
     }
-  }
+  };
 
-  onFocus = (event) => {
-    const { disabled, onFocus } = this.props;
+  onFocus = event => {
+    const { disabled, onFocus, openCalendarOnFocus } = this.props;
 
     if (onFocus) {
       onFocus(event);
@@ -81,26 +81,26 @@ export default class DatePicker extends PureComponent {
       return;
     }
 
-    this.openCalendar();
-  }
+    if (openCalendarOnFocus) this.openCalendar();
+  };
 
   openCalendar = () => {
     this.setState({ isOpen: true });
-  }
+  };
 
   closeCalendar = () => {
-    this.setState((prevState) => {
+    this.setState(prevState => {
       if (!prevState.isOpen) {
         return null;
       }
 
       return { isOpen: false };
     });
-  }
+  };
 
   toggleCalendar = () => {
     this.setState(prevState => ({ isOpen: !prevState.isOpen }));
-  }
+  };
 
   stopPropagation = event => event.stopPropagation();
 
@@ -109,9 +109,14 @@ export default class DatePicker extends PureComponent {
   handleOutsideActionListeners(shouldListen) {
     const { isOpen } = this.state;
 
-    const shouldListenWithFallback = typeof shouldListen !== 'undefined' ? shouldListen : isOpen;
-    const fnName = shouldListenWithFallback ? 'addEventListener' : 'removeEventListener';
-    outsideActionEvents.forEach(eventName => document[fnName](eventName, this.onOutsideAction));
+    const shouldListenWithFallback =
+      typeof shouldListen !== "undefined" ? shouldListen : isOpen;
+    const fnName = shouldListenWithFallback
+      ? "addEventListener"
+      : "removeEventListener";
+    outsideActionEvents.forEach(eventName =>
+      document[fnName](eventName, this.onOutsideAction)
+    );
   }
 
   renderInputs() {
@@ -138,7 +143,7 @@ export default class DatePicker extends PureComponent {
       showLeadingZeros,
       value,
       yearAriaLabel,
-      yearPlaceholder,
+      yearPlaceholder
     } = this.props;
     const { isOpen } = this.state;
 
@@ -148,13 +153,13 @@ export default class DatePicker extends PureComponent {
       dayAriaLabel,
       monthAriaLabel,
       nativeInputAriaLabel,
-      yearAriaLabel,
+      yearAriaLabel
     };
 
     const placeholderProps = {
       dayPlaceholder,
       monthPlaceholder,
-      yearPlaceholder,
+      yearPlaceholder
     };
 
     return (
@@ -226,7 +231,12 @@ export default class DatePicker extends PureComponent {
 
     return (
       <Fit>
-        <div className={mergeClassNames(className, `${className}--${isOpen ? 'open' : 'closed'}`)}>
+        <div
+          className={mergeClassNames(
+            className,
+            `${className}--${isOpen ? "open" : "closed"}`
+          )}
+        >
           <Calendar
             className={calendarClassName}
             onChange={this.onChange}
@@ -246,13 +256,13 @@ export default class DatePicker extends PureComponent {
       <div
         className={mergeClassNames(
           baseClassName,
-          `${baseClassName}--${isOpen ? 'open' : 'closed'}`,
-          `${baseClassName}--${disabled ? 'disabled' : 'enabled'}`,
-          className,
+          `${baseClassName}--${isOpen ? "open" : "closed"}`,
+          `${baseClassName}--${disabled ? "disabled" : "enabled"}`,
+          className
         )}
         {...this.eventProps}
         onFocus={this.onFocus}
-        ref={(ref) => {
+        ref={ref => {
           if (!ref) {
             return;
           }
@@ -268,12 +278,12 @@ export default class DatePicker extends PureComponent {
 }
 
 const iconProps = {
-  xmlns: 'http://www.w3.org/2000/svg',
+  xmlns: "http://www.w3.org/2000/svg",
   width: 19,
   height: 19,
-  viewBox: '0 0 19 19',
-  stroke: 'black',
-  strokeWidth: 2,
+  viewBox: "0 0 19 19",
+  stroke: "black",
+  strokeWidth: 2
 };
 
 const CalendarIcon = (
@@ -301,24 +311,25 @@ DatePicker.defaultProps = {
   calendarIcon: CalendarIcon,
   clearIcon: ClearIcon,
   isOpen: null,
-  returnValue: 'start',
+  openCalendarOnFocus: true,
+  returnValue: "start"
 };
 
 const isValue = PropTypes.oneOfType([
   PropTypes.string,
-  PropTypes.instanceOf(Date),
+  PropTypes.instanceOf(Date)
 ]);
 
 DatePicker.propTypes = {
   calendarAriaLabel: PropTypes.string,
   calendarClassName: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string),
+    PropTypes.arrayOf(PropTypes.string)
   ]),
   calendarIcon: PropTypes.node,
   className: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string),
+    PropTypes.arrayOf(PropTypes.string)
   ]),
   clearAriaLabel: PropTypes.string,
   clearIcon: PropTypes.node,
@@ -340,15 +351,13 @@ DatePicker.propTypes = {
   onCalendarOpen: PropTypes.func,
   onChange: PropTypes.func,
   onFocus: PropTypes.func,
+  openCalendarOnFocus: PropTypes.bool,
   required: PropTypes.bool,
-  returnValue: PropTypes.oneOf(['start', 'end', 'range']),
+  returnValue: PropTypes.oneOf(["start", "end", "range"]),
   showLeadingZeros: PropTypes.bool,
-  value: PropTypes.oneOfType([
-    isValue,
-    PropTypes.arrayOf(isValue),
-  ]),
+  value: PropTypes.oneOfType([isValue, PropTypes.arrayOf(isValue)]),
   yearAriaLabel: PropTypes.string,
-  yearPlaceholder: PropTypes.string,
+  yearPlaceholder: PropTypes.string
 };
 
 polyfill(DatePicker);
