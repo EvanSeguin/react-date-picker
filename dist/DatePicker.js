@@ -97,10 +97,13 @@ function (_PureComponent) {
 
     _defineProperty(_assertThisInitialized(_this), "onChange", function (value) {
       var closeCalendar = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      var openCalendarOnFocus = _this.props.openCalendarOnFocus;
 
-      _this.setState({
-        isOpen: !closeCalendar
-      });
+      if (openCalendarOnFocus || closeCalendar) {
+        _this.setState({
+          isOpen: !closeCalendar
+        });
+      }
 
       var onChange = _this.props.onChange;
 
@@ -161,6 +164,12 @@ function (_PureComponent) {
       return _this.onChange(null);
     });
 
+    _defineProperty(_assertThisInitialized(_this), "checkDateValidity", function () {
+      if (_this.dateinput !== undefined) {
+        return _this.dateinput.checkDateValidity();
+      }
+    });
+
     return _this;
   }
 
@@ -202,6 +211,8 @@ function (_PureComponent) {
   }, {
     key: "renderInputs",
     value: function renderInputs() {
+      var _this3 = this;
+
       var _this$props3 = this.props,
           calendarAriaLabel = _this$props3.calendarAriaLabel,
           calendarIcon = _this$props3.calendarIcon,
@@ -259,7 +270,10 @@ function (_PureComponent) {
         required: required,
         returnValue: returnValue,
         showLeadingZeros: showLeadingZeros,
-        value: valueFrom
+        value: valueFrom,
+        ref: function ref(_ref) {
+          return _this3.dateinput = _ref;
+        }
       })), clearIcon !== null && _react["default"].createElement("button", {
         "aria-label": clearAriaLabel,
         className: "".concat(baseClassName, "__clear-button ").concat(baseClassName, "__button"),
@@ -306,7 +320,7 @@ function (_PureComponent) {
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this4 = this;
 
       var _this$props5 = this.props,
           className = _this$props5.className,
@@ -316,12 +330,12 @@ function (_PureComponent) {
         className: (0, _mergeClassNames["default"])(baseClassName, "".concat(baseClassName, "--").concat(isOpen ? "open" : "closed"), "".concat(baseClassName, "--").concat(disabled ? "disabled" : "enabled"), className)
       }, this.eventProps, {
         onFocus: this.onFocus,
-        ref: function ref(_ref) {
-          if (!_ref) {
+        ref: function ref(_ref2) {
+          if (!_ref2) {
             return;
           }
 
-          _this3.wrapper = _ref;
+          _this4.wrapper = _ref2;
         }
       }), this.renderInputs(), this.renderCalendar());
     }

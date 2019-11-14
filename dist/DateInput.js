@@ -77,8 +77,8 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 var defaultMinDate = new Date(-8.64e15);
 var defaultMaxDate = new Date(8.64e15);
-var allViews = ['century', 'decade', 'year', 'month'];
-var allValueTypes = [].concat(_toConsumableArray(allViews.slice(1)), ['day']);
+var allViews = ["century", "decade", "year", "month"];
+var allValueTypes = [].concat(_toConsumableArray(allViews.slice(1)), ["day"]);
 
 var datesAreDifferent = function datesAreDifferent(date1, date2) {
   return date1 && !date2 || !date1 && date2 || date1 && date2 && date1.getTime() !== date2.getTime();
@@ -155,7 +155,7 @@ var getDetailValueArray = function getDetailValueArray(value, minDate, maxDate, 
 };
 
 var isValidInput = function isValidInput(element) {
-  return element.tagName === 'INPUT' && element.type === 'number';
+  return element.tagName === "INPUT" && element.type === "number";
 };
 
 var findInput = function findInput(element, property) {
@@ -176,7 +176,7 @@ var _renderCustomInputs = function renderCustomInputs(placeholder, elementFuncti
   var usedFunctions = [];
   var pattern = new RegExp(Object.keys(elementFunctions).map(function (el) {
     return "".concat(el, "+");
-  }).join('|'), 'g');
+  }).join("|"), "g");
   var matches = placeholder.match(pattern);
   return placeholder.split(pattern).reduce(function (arr, element, index) {
     var divider = element && // eslint-disable-next-line react/no-array-index-key
@@ -238,13 +238,13 @@ function (_PureComponent) {
 
     _defineProperty(_assertThisInitialized(_this), "onKeyDown", function (event) {
       switch (event.key) {
-        case 'ArrowLeft':
-        case 'ArrowRight':
+        case "ArrowLeft":
+        case "ArrowRight":
         case _this.divider:
           {
             event.preventDefault();
             var input = event.target;
-            var property = event.key === 'ArrowLeft' ? 'previousElementSibling' : 'nextElementSibling';
+            var property = event.key === "ArrowLeft" ? "previousElementSibling" : "nextElementSibling";
             var nextInput = findInput(input, property);
             focus(nextInput);
             break;
@@ -264,7 +264,7 @@ function (_PureComponent) {
       }
 
       var value = input.value;
-      var max = parseInt(input.getAttribute('max'), 10);
+      var max = parseInt(input.getAttribute("max"), 10);
       /**
        * Given 1, the smallest possible number the user could type by adding another digit is 10.
        * 10 would be a valid value given max = 12, so we won't jump to the next input.
@@ -273,7 +273,7 @@ function (_PureComponent) {
        */
 
       if (value * 10 > max) {
-        var property = 'nextElementSibling';
+        var property = "nextElementSibling";
         var nextInput = findInput(input, property);
         focus(nextInput);
       }
@@ -300,7 +300,7 @@ function (_PureComponent) {
           return null;
         }
 
-        var _value$split = value.split('-'),
+        var _value$split = value.split("-"),
             _value$split2 = _slicedToArray(_value$split, 3),
             yearString = _value$split2[0],
             monthString = _value$split2[1],
@@ -344,6 +344,33 @@ function (_PureComponent) {
 
         onChange(processedValue, false);
       }
+    });
+
+    _defineProperty(_assertThisInitialized(_this), "checkDateValidity", function () {
+      var formElements = [_this.dayInput, _this.monthInput, _this.yearInput].filter(Boolean);
+      var values = {};
+      formElements.forEach(function (formElement) {
+        values[formElement.name] = formElement.value;
+      });
+
+      if (formElements.every(function (formElement) {
+        return !formElement.value;
+      })) {
+        return false;
+      } else if (formElements.every(function (formElement) {
+        return formElement.value && formElement.checkValidity();
+      })) {
+        var year = parseInt(values.year, 10);
+        var month = parseInt(values.month || 1, 10);
+        var day = parseInt(values.day || 1, 10);
+        var proposedValue = new Date(year, month - 1, day);
+
+        var processedValue = _this.getProcessedValue(proposedValue);
+
+        return true;
+      }
+
+      return false;
     });
 
     _defineProperty(_assertThisInitialized(_this), "renderDay", function (currentMatch) {
@@ -444,17 +471,17 @@ function (_PureComponent) {
           returnValue = _this$props4.returnValue;
 
       switch (returnValue) {
-        case 'start':
+        case "start":
           return getDetailValueFrom(value, minDate, maxDate, maxDetail);
 
-        case 'end':
+        case "end":
           return getDetailValueTo(value, minDate, maxDate, maxDetail);
 
-        case 'range':
+        case "range":
           return getDetailValueArray(value, minDate, maxDate, maxDetail);
 
         default:
-          throw new Error('Invalid returnValue.');
+          throw new Error("Invalid returnValue.");
       }
     }
   }, {
@@ -467,7 +494,7 @@ function (_PureComponent) {
         M: this.renderMonth,
         y: this.renderYear
       };
-      var allowMultipleInstances = typeof format !== 'undefined';
+      var allowMultipleInstances = typeof format !== "undefined";
       return _renderCustomInputs(placeholder, elementFunctions, allowMultipleInstances);
     }
   }, {
@@ -509,16 +536,16 @@ function (_PureComponent) {
     get: function get() {
       var maxDetail = this.props.maxDetail;
       var options = {
-        year: 'numeric'
+        year: "numeric"
       };
       var level = allViews.indexOf(maxDetail);
 
       if (level >= 2) {
-        options.month = 'numeric';
+        options.month = "numeric";
       }
 
       if (level >= 3) {
-        options.day = 'numeric';
+        options.day = "numeric";
       }
 
       return (0, _dateFormatter.getFormatter)(options);
@@ -552,7 +579,7 @@ function (_PureComponent) {
       var monthIndex = 11;
       var day = 11;
       var date = new Date(year, monthIndex, day);
-      return this.formatDate(locale, date).replace(this.formatNumber(locale, year), 'y').replace(this.formatNumber(locale, monthIndex + 1), 'M').replace(this.formatNumber(locale, day), 'd');
+      return this.formatDate(locale, date).replace(this.formatNumber(locale, year), "y").replace(this.formatNumber(locale, monthIndex + 1), "M").replace(this.formatNumber(locale, day), "d");
     }
   }, {
     key: "commonInputProps",
@@ -614,8 +641,8 @@ function (_PureComponent) {
       var values = [nextValue, prevState.value];
 
       if ( // Toggling calendar visibility resets values
-      nextState.isCalendarOpen // Flag was toggled
-      || datesAreDifferent.apply(void 0, _toConsumableArray(values.map(function (value) {
+      nextState.isCalendarOpen || // Flag was toggled
+      datesAreDifferent.apply(void 0, _toConsumableArray(values.map(function (value) {
         return getDetailValueFrom(value, minDate, maxDate, maxDetail);
       }))) || datesAreDifferent.apply(void 0, _toConsumableArray(values.map(function (value) {
         return getDetailValueTo(value, minDate, maxDate, maxDetail);
@@ -642,9 +669,9 @@ function (_PureComponent) {
 
 exports["default"] = DateInput;
 DateInput.defaultProps = {
-  maxDetail: 'month',
-  name: 'date',
-  returnValue: 'start'
+  maxDetail: "month",
+  name: "date",
+  returnValue: "start"
 };
 
 var isValue = _propTypes["default"].oneOfType([_propTypes["default"].string, _propTypes["default"].instanceOf(Date)]);
@@ -666,7 +693,7 @@ DateInput.propTypes = {
   nativeInputAriaLabel: _propTypes["default"].string,
   onChange: _propTypes["default"].func,
   required: _propTypes["default"].bool,
-  returnValue: _propTypes["default"].oneOf(['start', 'end', 'range']),
+  returnValue: _propTypes["default"].oneOf(["start", "end", "range"]),
   showLeadingZeros: _propTypes["default"].bool,
   value: _propTypes["default"].oneOfType([isValue, _propTypes["default"].arrayOf(isValue)]),
   yearAriaLabel: _propTypes["default"].string,

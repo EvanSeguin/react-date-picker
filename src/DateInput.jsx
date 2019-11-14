@@ -1,35 +1,28 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
-import { polyfill } from 'react-lifecycles-compat';
+import React, { PureComponent } from "react";
+import PropTypes from "prop-types";
+import { polyfill } from "react-lifecycles-compat";
 
-import Divider from './Divider';
-import DayInput from './DateInput/DayInput';
-import MonthInput from './DateInput/MonthInput';
-import MonthSelect from './DateInput/MonthSelect';
-import YearInput from './DateInput/YearInput';
-import NativeInput from './DateInput/NativeInput';
+import Divider from "./Divider";
+import DayInput from "./DateInput/DayInput";
+import MonthInput from "./DateInput/MonthInput";
+import MonthSelect from "./DateInput/MonthSelect";
+import YearInput from "./DateInput/YearInput";
+import NativeInput from "./DateInput/NativeInput";
 
-import { getFormatter } from './shared/dateFormatter';
-import {
-  getBegin,
-  getDay,
-  getEnd,
-  getMonth,
-  getYear,
-} from './shared/dates';
-import { isMaxDate, isMinDate } from './shared/propTypes';
-import { between } from './shared/utils';
+import { getFormatter } from "./shared/dateFormatter";
+import { getBegin, getDay, getEnd, getMonth, getYear } from "./shared/dates";
+import { isMaxDate, isMinDate } from "./shared/propTypes";
+import { between } from "./shared/utils";
 
 const defaultMinDate = new Date(-8.64e15);
 const defaultMaxDate = new Date(8.64e15);
-const allViews = ['century', 'decade', 'year', 'month'];
-const allValueTypes = [...allViews.slice(1), 'day'];
+const allViews = ["century", "decade", "year", "month"];
+const allValueTypes = [...allViews.slice(1), "day"];
 
-const datesAreDifferent = (date1, date2) => (
-  (date1 && !date2)
-  || (!date1 && date2)
-  || (date1 && date2 && date1.getTime() !== date2.getTime())
-);
+const datesAreDifferent = (date1, date2) =>
+  (date1 && !date2) ||
+  (!date1 && date2) ||
+  (date1 && date2 && date1.getTime() !== date2.getTime());
 
 /**
  * Returns value type that can be returned with currently applied settings.
@@ -44,7 +37,7 @@ const getValueFromRange = (valueOrArrayOfValues, index) => {
   return valueOrArrayOfValues;
 };
 
-const parseAndValidateDate = (rawValue) => {
+const parseAndValidateDate = rawValue => {
   if (!rawValue) {
     return null;
   }
@@ -58,7 +51,7 @@ const parseAndValidateDate = (rawValue) => {
   return valueDate;
 };
 
-const getValueFrom = (value) => {
+const getValueFrom = value => {
   const valueFrom = getValueFromRange(value, 0);
 
   return parseAndValidateDate(valueFrom);
@@ -76,7 +69,7 @@ const getDetailValueFrom = (value, minDate, maxDate, maxDetail) => {
   return between(detailValueFrom, minDate, maxDate);
 };
 
-const getValueTo = (value) => {
+const getValueTo = value => {
   const valueTo = getValueFromRange(value, 1);
 
   return parseAndValidateDate(valueTo);
@@ -101,11 +94,12 @@ const getDetailValueArray = (value, minDate, maxDate, maxDetail) => {
 
   return [
     getDetailValueFrom(value, minDate, maxDate, maxDetail),
-    getDetailValueTo(value, minDate, maxDate, maxDetail),
+    getDetailValueTo(value, minDate, maxDate, maxDetail)
   ];
 };
 
-const isValidInput = element => element.tagName === 'INPUT' && element.type === 'number';
+const isValidInput = element =>
+  element.tagName === "INPUT" && element.type === "number";
 
 const findInput = (element, property) => {
   let nextElement = element;
@@ -117,49 +111,51 @@ const findInput = (element, property) => {
 
 const focus = element => element && element.focus();
 
-const renderCustomInputs = (placeholder, elementFunctions, allowMultipleInstances) => {
+const renderCustomInputs = (
+  placeholder,
+  elementFunctions,
+  allowMultipleInstances
+) => {
   const usedFunctions = [];
   const pattern = new RegExp(
-    Object.keys(elementFunctions).map(el => `${el}+`).join('|'), 'g',
+    Object.keys(elementFunctions)
+      .map(el => `${el}+`)
+      .join("|"),
+    "g"
   );
   const matches = placeholder.match(pattern);
 
-  return placeholder.split(pattern)
-    .reduce((arr, element, index) => {
-      const divider = element && (
-        // eslint-disable-next-line react/no-array-index-key
-        <Divider key={`separator_${index}`}>
-          {element}
-        </Divider>
-      );
-      const res = [...arr, divider];
-      const currentMatch = matches && matches[index];
+  return placeholder.split(pattern).reduce((arr, element, index) => {
+    const divider = element && (
+      // eslint-disable-next-line react/no-array-index-key
+      <Divider key={`separator_${index}`}>{element}</Divider>
+    );
+    const res = [...arr, divider];
+    const currentMatch = matches && matches[index];
 
-      if (currentMatch) {
-        const renderFunction = (
-          elementFunctions[currentMatch]
-          || elementFunctions[
-            Object.keys(elementFunctions)
-              .find(elementFunction => currentMatch.match(elementFunction))
-          ]
-        );
+    if (currentMatch) {
+      const renderFunction =
+        elementFunctions[currentMatch] ||
+        elementFunctions[
+          Object.keys(elementFunctions).find(elementFunction =>
+            currentMatch.match(elementFunction)
+          )
+        ];
 
-        if (!allowMultipleInstances && usedFunctions.includes(renderFunction)) {
-          res.push(currentMatch);
-        } else {
-          res.push(renderFunction(currentMatch));
-          usedFunctions.push(renderFunction);
-        }
+      if (!allowMultipleInstances && usedFunctions.includes(renderFunction)) {
+        res.push(currentMatch);
+      } else {
+        res.push(renderFunction(currentMatch));
+        usedFunctions.push(renderFunction);
       }
-      return res;
-    }, []);
+    }
+    return res;
+  }, []);
 };
 
 export default class DateInput extends PureComponent {
   static getDerivedStateFromProps(nextProps, prevState) {
-    const {
-      minDate, maxDate, maxDetail,
-    } = nextProps;
+    const { minDate, maxDate, maxDetail } = nextProps;
 
     const nextState = {};
 
@@ -176,16 +172,25 @@ export default class DateInput extends PureComponent {
      * which values provided are limited by minDate and maxDate so that the dates are the same),
      * get a new one.
      */
-    const nextValue = getDetailValueFrom(nextProps.value, minDate, maxDate, maxDetail);
+    const nextValue = getDetailValueFrom(
+      nextProps.value,
+      minDate,
+      maxDate,
+      maxDetail
+    );
     const values = [nextValue, prevState.value];
     if (
       // Toggling calendar visibility resets values
-      nextState.isCalendarOpen // Flag was toggled
-      || datesAreDifferent(
-        ...values.map(value => getDetailValueFrom(value, minDate, maxDate, maxDetail)),
-      )
-      || datesAreDifferent(
-        ...values.map(value => getDetailValueTo(value, minDate, maxDate, maxDetail)),
+      nextState.isCalendarOpen || // Flag was toggled
+      datesAreDifferent(
+        ...values.map(value =>
+          getDetailValueFrom(value, minDate, maxDate, maxDetail)
+        )
+      ) ||
+      datesAreDifferent(
+        ...values.map(value =>
+          getDetailValueTo(value, minDate, maxDate, maxDetail)
+        )
       )
     ) {
       if (nextValue) {
@@ -206,19 +211,19 @@ export default class DateInput extends PureComponent {
   state = {
     year: null,
     month: null,
-    day: null,
+    day: null
   };
 
   get formatDate() {
     const { maxDetail } = this.props;
 
-    const options = { year: 'numeric' };
+    const options = { year: "numeric" };
     const level = allViews.indexOf(maxDetail);
     if (level >= 2) {
-      options.month = 'numeric';
+      options.month = "numeric";
     }
     if (level >= 3) {
-      options.day = 'numeric';
+      options.day = "numeric";
     }
 
     return getFormatter(options);
@@ -235,19 +240,17 @@ export default class DateInput extends PureComponent {
    * Gets current value in a desired format.
    */
   getProcessedValue(value) {
-    const {
-      minDate, maxDate, maxDetail, returnValue,
-    } = this.props;
+    const { minDate, maxDate, maxDetail, returnValue } = this.props;
 
     switch (returnValue) {
-      case 'start':
+      case "start":
         return getDetailValueFrom(value, minDate, maxDate, maxDetail);
-      case 'end':
+      case "end":
         return getDetailValueTo(value, minDate, maxDate, maxDetail);
-      case 'range':
+      case "range":
         return getDetailValueArray(value, minDate, maxDate, maxDetail);
       default:
-        throw new Error('Invalid returnValue.');
+        throw new Error("Invalid returnValue.");
     }
   }
 
@@ -268,12 +271,10 @@ export default class DateInput extends PureComponent {
 
     const date = new Date(year, monthIndex, day);
 
-    return (
-      this.formatDate(locale, date)
-        .replace(this.formatNumber(locale, year), 'y')
-        .replace(this.formatNumber(locale, monthIndex + 1), 'M')
-        .replace(this.formatNumber(locale, day), 'd')
-    );
+    return this.formatDate(locale, date)
+      .replace(this.formatNumber(locale, year), "y")
+      .replace(this.formatNumber(locale, monthIndex + 1), "M")
+      .replace(this.formatNumber(locale, day), "d");
   }
 
   get commonInputProps() {
@@ -283,7 +284,7 @@ export default class DateInput extends PureComponent {
       isCalendarOpen,
       maxDate,
       minDate,
-      required,
+      required
     } = this.props;
 
     return {
@@ -299,7 +300,7 @@ export default class DateInput extends PureComponent {
       itemRef: (ref, name) => {
         // Save a reference to each input field
         this[`${name}Input`] = ref;
-      },
+      }
     };
   }
 
@@ -309,32 +310,35 @@ export default class DateInput extends PureComponent {
     return getValueType(maxDetail);
   }
 
-  onClick = (event) => {
+  onClick = event => {
     if (event.target === event.currentTarget) {
       // Wrapper was directly clicked
       const firstInput = event.target.children[1];
       focus(firstInput);
     }
-  }
+  };
 
-  onKeyDown = (event) => {
+  onKeyDown = event => {
     switch (event.key) {
-      case 'ArrowLeft':
-      case 'ArrowRight':
+      case "ArrowLeft":
+      case "ArrowRight":
       case this.divider: {
         event.preventDefault();
 
         const { target: input } = event;
-        const property = event.key === 'ArrowLeft' ? 'previousElementSibling' : 'nextElementSibling';
+        const property =
+          event.key === "ArrowLeft"
+            ? "previousElementSibling"
+            : "nextElementSibling";
         const nextInput = findInput(input, property);
         focus(nextInput);
         break;
       }
       default:
     }
-  }
+  };
 
-  onKeyUp = (event) => {
+  onKeyUp = event => {
     const { key, target: input } = event;
 
     const isNumberKey = !isNaN(parseInt(key, 10));
@@ -344,7 +348,7 @@ export default class DateInput extends PureComponent {
     }
 
     const { value } = input;
-    const max = parseInt(input.getAttribute('max'), 10);
+    const max = parseInt(input.getAttribute("max"), 10);
 
     /**
      * Given 1, the smallest possible number the user could type by adding another digit is 10.
@@ -353,28 +357,28 @@ export default class DateInput extends PureComponent {
      * this field doesn't make sense.
      */
     if (value * 10 > max) {
-      const property = 'nextElementSibling';
+      const property = "nextElementSibling";
       const nextInput = findInput(input, property);
       focus(nextInput);
     }
-  }
+  };
 
   /**
    * Called when non-native date input is changed.
    */
-  onChange = (event) => {
+  onChange = event => {
     const { name, value } = event.target;
 
     this.setState(
       { [name]: value ? parseInt(value, 10) : null },
-      this.onChangeExternal,
+      this.onChangeExternal
     );
-  }
+  };
 
   /**
    * Called when native date input is changed.
    */
-  onChangeNative = (event) => {
+  onChangeNative = event => {
     const { onChange } = this.props;
     const { value } = event.target;
 
@@ -387,7 +391,7 @@ export default class DateInput extends PureComponent {
         return null;
       }
 
-      const [yearString, monthString, dayString] = value.split('-');
+      const [yearString, monthString, dayString] = value.split("-");
       const year = parseInt(yearString, 10);
       const monthIndex = parseInt(monthString, 10) - 1 || 0;
       const date = parseInt(dayString, 10) || 1;
@@ -396,7 +400,7 @@ export default class DateInput extends PureComponent {
     })();
 
     onChange(processedValue, false);
-  }
+  };
 
   /**
    * Called after internal onChange. Checks input validity. If all fields are valid,
@@ -409,17 +413,23 @@ export default class DateInput extends PureComponent {
       return;
     }
 
-    const formElements = [this.dayInput, this.monthInput, this.yearInput].filter(Boolean);
+    const formElements = [
+      this.dayInput,
+      this.monthInput,
+      this.yearInput
+    ].filter(Boolean);
 
     const values = {};
-    formElements.forEach((formElement) => {
+    formElements.forEach(formElement => {
       values[formElement.name] = formElement.value;
     });
 
     if (formElements.every(formElement => !formElement.value)) {
       onChange(null, false);
     } else if (
-      formElements.every(formElement => formElement.value && formElement.checkValidity())
+      formElements.every(
+        formElement => formElement.value && formElement.checkValidity()
+      )
     ) {
       const year = parseInt(values.year, 10);
       const month = parseInt(values.month || 1, 10);
@@ -429,9 +439,41 @@ export default class DateInput extends PureComponent {
       const processedValue = this.getProcessedValue(proposedValue);
       onChange(processedValue, false);
     }
-  }
+  };
 
-  renderDay = (currentMatch) => {
+  checkDateValidity = () => {
+    const formElements = [
+      this.dayInput,
+      this.monthInput,
+      this.yearInput
+    ].filter(Boolean);
+
+    const values = {};
+    formElements.forEach(formElement => {
+      values[formElement.name] = formElement.value;
+    });
+
+    if (formElements.every(formElement => !formElement.value)) {
+      return false;
+    } else if (
+      formElements.every(
+        formElement => formElement.value && formElement.checkValidity()
+      )
+    ) {
+      const year = parseInt(values.year, 10);
+      const month = parseInt(values.month || 1, 10);
+      const day = parseInt(values.day || 1, 10);
+
+      const proposedValue = new Date(year, month - 1, day);
+      const processedValue = this.getProcessedValue(proposedValue);
+
+      return true;
+    }
+
+    return false;
+  };
+
+  renderDay = currentMatch => {
     const { dayAriaLabel, dayPlaceholder, showLeadingZeros } = this.props;
     const { day, month, year } = this.state;
 
@@ -439,7 +481,8 @@ export default class DateInput extends PureComponent {
       throw new Error(`Unsupported token: ${currentMatch}`);
     }
 
-    const showLeadingZerosFromFormat = currentMatch && currentMatch.length === 2;
+    const showLeadingZerosFromFormat =
+      currentMatch && currentMatch.length === 2;
 
     return (
       <DayInput
@@ -453,14 +496,14 @@ export default class DateInput extends PureComponent {
         year={year}
       />
     );
-  }
+  };
 
-  renderMonth = (currentMatch) => {
+  renderMonth = currentMatch => {
     const {
       locale,
       monthAriaLabel,
       monthPlaceholder,
-      showLeadingZeros,
+      showLeadingZeros
     } = this.props;
     const { month, year } = this.state;
 
@@ -483,7 +526,8 @@ export default class DateInput extends PureComponent {
       );
     }
 
-    const showLeadingZerosFromFormat = currentMatch && currentMatch.length === 2;
+    const showLeadingZerosFromFormat =
+      currentMatch && currentMatch.length === 2;
 
     return (
       <MonthInput
@@ -496,7 +540,7 @@ export default class DateInput extends PureComponent {
         year={year}
       />
     );
-  }
+  };
 
   renderYear = () => {
     const { yearAriaLabel, yearPlaceholder } = this.props;
@@ -512,7 +556,7 @@ export default class DateInput extends PureComponent {
         valueType={this.valueType}
       />
     );
-  }
+  };
 
   renderCustomInputs() {
     const { placeholder } = this;
@@ -521,11 +565,15 @@ export default class DateInput extends PureComponent {
     const elementFunctions = {
       d: this.renderDay,
       M: this.renderMonth,
-      y: this.renderYear,
+      y: this.renderYear
     };
 
-    const allowMultipleInstances = typeof format !== 'undefined';
-    return renderCustomInputs(placeholder, elementFunctions, allowMultipleInstances);
+    const allowMultipleInstances = typeof format !== "undefined";
+    return renderCustomInputs(
+      placeholder,
+      elementFunctions,
+      allowMultipleInstances
+    );
   }
 
   renderNativeInput() {
@@ -535,7 +583,7 @@ export default class DateInput extends PureComponent {
       minDate,
       name,
       nativeInputAriaLabel,
-      required,
+      required
     } = this.props;
     const { value } = this.state;
 
@@ -559,11 +607,7 @@ export default class DateInput extends PureComponent {
     const { className } = this.props;
 
     return (
-      <div
-        className={className}
-        onClick={this.onClick}
-        role="presentation"
-      >
+      <div className={className} onClick={this.onClick} role="presentation">
         {this.renderNativeInput()}
         {this.renderCustomInputs()}
       </div>
@@ -572,14 +616,14 @@ export default class DateInput extends PureComponent {
 }
 
 DateInput.defaultProps = {
-  maxDetail: 'month',
-  name: 'date',
-  returnValue: 'start',
+  maxDetail: "month",
+  name: "date",
+  returnValue: "start"
 };
 
 const isValue = PropTypes.oneOfType([
   PropTypes.string,
-  PropTypes.instanceOf(Date),
+  PropTypes.instanceOf(Date)
 ]);
 
 DateInput.propTypes = {
@@ -599,14 +643,11 @@ DateInput.propTypes = {
   nativeInputAriaLabel: PropTypes.string,
   onChange: PropTypes.func,
   required: PropTypes.bool,
-  returnValue: PropTypes.oneOf(['start', 'end', 'range']),
+  returnValue: PropTypes.oneOf(["start", "end", "range"]),
   showLeadingZeros: PropTypes.bool,
-  value: PropTypes.oneOfType([
-    isValue,
-    PropTypes.arrayOf(isValue),
-  ]),
+  value: PropTypes.oneOfType([isValue, PropTypes.arrayOf(isValue)]),
   yearAriaLabel: PropTypes.string,
-  yearPlaceholder: PropTypes.string,
+  yearPlaceholder: PropTypes.string
 };
 
 polyfill(DateInput);

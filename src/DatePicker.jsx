@@ -59,10 +59,13 @@ export default class DatePicker extends PureComponent {
   };
 
   onChange = (value, closeCalendar = true) => {
-    this.setState({
-      isOpen: !closeCalendar
-    });
+    const { openCalendarOnFocus } = this.props;
 
+    if (openCalendarOnFocus || closeCalendar) {
+      this.setState({
+        isOpen: !closeCalendar
+      });
+    }
     const { onChange } = this.props;
     if (onChange) {
       onChange(value);
@@ -118,6 +121,12 @@ export default class DatePicker extends PureComponent {
       document[fnName](eventName, this.onOutsideAction)
     );
   }
+
+  checkDateValidity = () => {
+    if (this.dateinput !== undefined) {
+      return this.dateinput.checkDateValidity();
+    }
+  };
 
   renderInputs() {
     const {
@@ -181,6 +190,7 @@ export default class DatePicker extends PureComponent {
           returnValue={returnValue}
           showLeadingZeros={showLeadingZeros}
           value={valueFrom}
+          ref={ref => (this.dateinput = ref)}
         />
         {clearIcon !== null && (
           <button
